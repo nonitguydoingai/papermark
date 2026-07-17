@@ -180,6 +180,52 @@ export const sendConversationMessageNotificationTask = task({
   },
 });
 
+// Notifies a team member when they are @-mentioned in a conversation message.
+export const sendConversationMentionNotificationTask = task({
+  id: "send-conversation-mention-notification",
+  retry: { maxAttempts: 3 },
+  run: async (payload: NotificationPayload & { mentionedUserId: string }) => {
+    logger.info("Sending mention notification", {
+      conversationId: payload.conversationId,
+      mentionedUserId: payload.mentionedUserId,
+    });
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs/send-conversation-team-member-notification`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            conversationId: payload.conversationId,
+            dataroomId: payload.dataroomId,
+            senderUserId: payload.senderUserId,
+            teamId: payload.teamId,
+            mentionedUserId: payload.mentionedUserId,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.INTERNAL_API_KEY}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        logger.error("Failed to send mention notification", {
+          mentionedUserId: payload.mentionedUserId,
+          error: await response.text(),
+        });
+      }
+    } catch (error) {
+      logger.error("Error sending mention notification", {
+        mentionedUserId: payload.mentionedUserId,
+        error,
+      });
+    }
+
+    return;
+  },
+});
+
 // New task specifically for notifying team members when viewers write messages
 export const sendConversationTeamMemberNotificationTask = task({
   id: "send-conversation-team-member-notification",
