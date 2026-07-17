@@ -1,5 +1,5 @@
 export function useViewerRequestList(_args: {
-  linkId: string;
+  linkId?: string;
   dataroomId?: string;
   viewerId?: string;
   isPreview?: boolean;
