@@ -39,3 +39,13 @@ export function ConversationSidebarProvider({
 export function useConversationSidebarSafe(): ConversationSidebarContextValue | null {
   return useContext(ConversationSidebarContext);
 }
+
+// Reserves layout space for the conversation sidebar when open. Self-hosted
+// build has no sidebar UI, so this is a passthrough that just renders children.
+export function ConversationSidebarLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <>{children}</>;
+}
