@@ -9,6 +9,8 @@ export type DataroomLayoutCardId =
   | "NOTION"
   | "CUSTOM";
 
+export type DataroomViewerLayoutPreset = DataroomLayoutCardId;
+
 export type DataroomViewerHeaderStyle = "DEFAULT" | "SPLIT" | "NOTION";
 
 export const DataroomCardLayoutSchema = z.enum(["LIST", "GRID", "COMPACT"]);
