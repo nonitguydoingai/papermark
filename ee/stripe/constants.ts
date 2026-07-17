@@ -1,3 +1,5 @@
+import { CURRENCY_SYMBOL, type Currency } from "./currency";
+
 export enum PlanEnum {
   Pro = "Pro",
   Business = "Business",
@@ -239,6 +241,7 @@ export const BASE_FEATURES: Record<PlanEnum, PlanFeatures> = {
 
 interface FeatureOptions {
   period?: PeriodType;
+  currency?: Currency;
   showHighlighted?: boolean;
   maxFeatures?: number;
   excludeFeatures?: string[];
@@ -253,6 +256,7 @@ export function getPlanFeatures(
 ): PlanFeatures {
   const {
     period = "monthly",
+    currency = "eur",
     showHighlighted = false,
     maxFeatures,
     excludeFeatures = [],
@@ -288,8 +292,13 @@ export function getPlanFeatures(
     const newFeature = { ...feature };
 
     if (feature.isUsers) {
-      // Use the pricing from the effective plan
-      newFeature.tooltip = PLAN_PRICING[effectivePlan].extraUserPrice[period];
+      // Use the pricing from the effective plan; tooltip text is authored in
+      // EUR, so swap the symbol when the caller requests USD.
+      const tooltip = PLAN_PRICING[effectivePlan].extraUserPrice[period];
+      newFeature.tooltip =
+        currency === "usd"
+          ? tooltip.replace(CURRENCY_SYMBOL.eur, CURRENCY_SYMBOL.usd)
+          : tooltip;
     }
 
     // Add isHighlighted property if feature is in highlightFeatures
