@@ -1,8 +1,31 @@
+import { z } from "zod";
+
 export type DataroomCardLayout = "LIST" | "GRID" | "COMPACT";
 
-export type DataroomLayoutCardId = "list" | "grid" | "compact";
+export type DataroomLayoutCardId =
+  | "STANDARD"
+  | "STRICT"
+  | "MODERN"
+  | "NOTION"
+  | "CUSTOM";
 
-export type DataroomViewerHeaderStyle = "DEFAULT" | "MINIMAL";
+export type DataroomViewerHeaderStyle = "DEFAULT" | "SPLIT" | "NOTION";
+
+export const DataroomCardLayoutSchema = z.enum(["LIST", "GRID", "COMPACT"]);
+
+export const DataroomViewerLayoutPresetSchema = z.enum([
+  "STANDARD",
+  "STRICT",
+  "MODERN",
+  "NOTION",
+  "CUSTOM",
+]);
+
+export const DataroomViewerHeaderStyleSchema = z.enum([
+  "DEFAULT",
+  "SPLIT",
+  "NOTION",
+]);
 
 export const CARD_LAYOUT_OPTIONS: {
   value: DataroomCardLayout;
@@ -16,7 +39,8 @@ export const CARD_LAYOUT_OPTIONS: {
 const CARD_LAYOUT_VALUES: DataroomCardLayout[] = ["LIST", "GRID", "COMPACT"];
 const HEADER_STYLE_VALUES: DataroomViewerHeaderStyle[] = [
   "DEFAULT",
-  "MINIMAL",
+  "SPLIT",
+  "NOTION",
 ];
 
 export function asDataroomCardLayout(value: unknown): DataroomCardLayout {
@@ -33,8 +57,48 @@ export function asDataroomViewerHeaderStyle(
     : "DEFAULT";
 }
 
-export function inferDataroomViewerLayoutPreset(
-  cardLayout: DataroomCardLayout,
-): DataroomLayoutCardId {
-  return cardLayout.toLowerCase() as DataroomLayoutCardId;
+// Matches the combinations set by applyLayoutPreset() in pages/branding.tsx.
+// Anything that doesn't match one of the 4 presets exactly is "CUSTOM".
+export function inferDataroomViewerLayoutPreset(params: {
+  cardLayout: DataroomCardLayout;
+  showFolderTree: boolean;
+  hideFolderIconsInMain: boolean;
+  viewerHeaderStyle: DataroomViewerHeaderStyle;
+}): DataroomLayoutCardId {
+  const { cardLayout, showFolderTree, hideFolderIconsInMain, viewerHeaderStyle } =
+    params;
+
+  if (
+    cardLayout === "LIST" &&
+    showFolderTree === true &&
+    viewerHeaderStyle === "DEFAULT" &&
+    hideFolderIconsInMain === false
+  ) {
+    return "STANDARD";
+  }
+  if (
+    cardLayout === "COMPACT" &&
+    showFolderTree === false &&
+    viewerHeaderStyle === "DEFAULT" &&
+    hideFolderIconsInMain === true
+  ) {
+    return "STRICT";
+  }
+  if (
+    cardLayout === "COMPACT" &&
+    showFolderTree === false &&
+    viewerHeaderStyle === "SPLIT" &&
+    hideFolderIconsInMain === true
+  ) {
+    return "MODERN";
+  }
+  if (
+    cardLayout === "GRID" &&
+    showFolderTree === false &&
+    viewerHeaderStyle === "NOTION" &&
+    hideFolderIconsInMain === false
+  ) {
+    return "NOTION";
+  }
+  return "CUSTOM";
 }
