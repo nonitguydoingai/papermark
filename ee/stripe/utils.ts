@@ -289,6 +289,7 @@ export const PLANS = [
     price: {
       monthly: {
         amount: 1499,
+        amountUsd: 1499,
         unitPrice: 1499,
         priceIds: {
           test: {
@@ -303,6 +304,7 @@ export const PLANS = [
       },
       yearly: {
         amount: 999,
+        amountUsd: 999,
         unitPrice: 999,
         priceIds: {
           test: {
