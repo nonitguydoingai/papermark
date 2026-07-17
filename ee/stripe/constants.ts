@@ -32,6 +32,7 @@ export interface Feature {
   usersIncluded?: number;
   isHighlighted?: boolean;
   isNotIncluded?: boolean;
+  aliasIds?: string[];
 }
 
 export interface PlanFeatures {
